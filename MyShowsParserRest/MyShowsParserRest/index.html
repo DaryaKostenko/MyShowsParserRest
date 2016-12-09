@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>My Shows Parser</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <div>
+        <h2>Все сериалы из базы данных</h2>
+        <ul id="shows" />
+    </div>
+    <div>
+        <h2>Поиск сериала по Id</h2>
+        <input type="text" id="showId" size="5" />
+        <input type="button" value="Поиск" onclick="find();" />
+        <p id="show" />
+        
+        <h2>Добавить сериал в базу по Id </h2>
+        <h4> Id </h4>
+        <input type="text" id="shoId" size="5" />
+        <p/>
+        <h4> Имя </h4>
+        <input type="text" id="shoName" size="5" />
+        <p />
+        <h4> Оригинальное имя </h4>
+        <input type="text" id="shoOrigName" size="5" />
+        <p />
+        <h4> Страна </h4>
+        <input type="text" id="shoCountry" size="5" />
+        <p />
+        <h4> Жанры </h4>
+        <input type="text" id="shoGanres" size="5" />
+        <p />
+        <h4> Рейтинг </h4>
+        <input type="text" id="shoRet" size="5" />
+        <p />
+        <input type="button" value="Добавить" onclick="add();" />
+        
+
+        <h2>Удалить сериал из базы по Id </h2>
+        <input type="text" id="shId" size="5" />
+        <input type="button" value="Удалить" onclick="del();" />
+    </div>
+    
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script>
+    var uri = 'api/myshows';
+
+    $(document).ready(function () {
+      // Send an AJAX request
+      $.getJSON(uri)
+          .done(function (data) {
+            // On success, 'data' contains a list of shows.
+            $.each(data, function (key, item) {
+              // Add a list item for the product.
+              $('<li>', { text: formatItem(item) }).appendTo($('#shows'));
+            });
+          });
+    });
+
+    function formatItem(item) {
+        return item.Id + " /" + item.Name + " /" + item.OriginalName + " /" + item.Country + " /" + item.Genres + " /" + item.MyShowsRating;
+    }
+
+    function find() {
+      var id = $('#showId').val();
+      $.getJSON(uri + '/' + id)
+          .done(function (data) {
+            $('#show').text(formatItem(data));
+          })
+          .fail(function (jqXHR, textStatus, err) {
+            $('#show').text('Error: ' + err);
+          });
+    }
+
+    function del() {
+        var id = $('#shId').val();
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("DELETE", uri + '/' + id);
+        xmlhttp.send();
+    }
+
+    function add() {
+       // var id = $('#shoId').val();
+        var show = { id: $('#shoId').val(), name: $('#shoName').val(), OriginalName: $('#shoOrigName').val(), Country: $('#shoCountry').val(), Genres: $('#shoGanres').val(), MyShowsRating: $('#shoRet').val() };
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify(show),
+                url: uri,
+                contentType: "application/json"
+            });
+        }
+        //function add() {
+    //    var id = $('#shoId').val();
+    //    var body = 'id=' + id;
+    //    var xmlhttp = new XMLHttpRequest();
+    //    xmlhttp.open("POST", uri, true);
+    //    xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    //    xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    //    xmlhttp.responseType = 'string';
+    //    xmlhttp.send(body);
+    //}
+    </script>
+</body>
+</html>
